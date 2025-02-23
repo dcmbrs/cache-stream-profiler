@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Service\Cache;
 use App\Service\HttpClient;
-use App\Service\Streamer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
@@ -14,7 +13,6 @@ class HomeController extends AbstractController
     public function __construct(
         protected Cache $cache,
         protected HttpClient $client,
-        protected Streamer $streamer
     )
     {
     }
@@ -32,14 +30,12 @@ class HomeController extends AbstractController
     #[Route('/stream', name: 'stream')]
     public function teststream()
     {
-        $this->cache->test('before stream');
-        $this->cache->test('before stream 2');
+//        $this->cache->test('before stream');
         $response = new StreamedResponse();
         $response->headers->set('Content-Type', 'text/event-stream');
         $response->setCallback(function () {
             $this->sendSseEvent('message', 'Hello, world!');
             $this->cache->test();
-            $this->cache->test('vivi');
             $this->client->test();
             $this->sendSseEvent('message', 'profiler cache pool `cache.app` empty :(');
             $this->sendSseEvent('message', 'profiler http works ! :)');
